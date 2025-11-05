@@ -1,0 +1,26 @@
+@Autowired
+JdbcTemplate jdbcTemplate;
+
+public void checkAllOracleTables() {
+
+    // get all table names in current schema
+    List<String> tableNames = jdbcTemplate.queryForList(
+            "SELECT table_name FROM user_tables",
+            String.class);
+
+    for (String table : tableNames) {
+        // Example: check count in each table
+        String sql = "SELECT COUNT(*) FROM " + table;
+        int count = jdbcTemplate.queryForObject(sql, Integer.class);
+
+        System.out.println(table + " -> " + count);
+        
+        // put your custom conditional logic
+        // if count == 2 -> stop further processing
+        
+        if(count == 2) {
+            System.out.println("Found table with count 2, stopping scheduler...");
+            break; // stop checking other tables
+        }
+    }
+}
