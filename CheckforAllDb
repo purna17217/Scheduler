@@ -24,3 +24,50 @@ public void checkAllOracleTables() {
         }
     }
 }
+
+
+
+@Autowired
+JdbcTemplate jdbcTemplate;
+
+public void checkDA_Tables() {
+
+    for(int i = 1; i <= 144; i++) {
+
+        // table name formatting (DA01 … DA09, DA10 … DA144)
+        String table = "DA" + String.format("%02d", i);
+
+        // query STAT and INST values (example: count where stat=2)
+        String sql = "SELECT COUNT(*) FROM " + table + " WHERE STAT = 2 AND INST = 'someValue'";
+
+        try {
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
+
+            if(count != null && count > 0) {
+                System.out.println(table + " -> Trigger condition matched!");
+                // stop scheduler here if you want to stop permanently
+                break;
+            } else {
+                System.out.println(table + " -> No match");
+            }
+
+        } catch (Exception ex) {
+            System.out.println(table + " table not found or query error → " + ex.getMessage());
+        }
+    }
+}
+
+
+
+
+
+public boolean checkDA_Tables() {
+
+    for(int i = 1; i <= 144; i++) {
+        String table = "DA" + String.format("%02d", i);
+        String sql = "SELECT COUNT(*) FROM " + table + " WHERE STAT = 2 AND INST = 'someValue'";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
+        if(count > 0) return true;  // means stop
+    }
+    return false;
+}
